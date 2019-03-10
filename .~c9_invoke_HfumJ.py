@@ -1,10 +1,7 @@
 import os
-from flask import Flask, render_template, redirect, request, url_for,request,session,flash
+from flask import Flask, render_template, redirect, request, url_for,request,session
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-import bcrypt
-
-
 
 
 
@@ -12,49 +9,6 @@ app = Flask(__name__)
 app.config["MONGO_DBNAME"] ='healthy_recipe_manager'
 app.config["MONGO_URI"] = "mongodb://root:gaslight318@ds055865.mlab.com:55865/healthy_recipe_manager"
 mongo = PyMongo(app)                
-app.secret_key = 'mysecretfort'
-
-
-
-
-
-@app.route('/')
-def index():
-    if 'username' in session:
-        return 'You are logged in as ' + session['username']
-
-    return render_template('index.html')
-
-@app.route('/login', methods=['POST'])
-def login():
-    users = mongo.db.users
-    login_user = users.find_one({'name' : request.form['username']})
-
-    if login_user:
-        if bcrypt.hashpw(request.form['pass'].encode('utf-8'),
-        login_user['password'].encode('utf-8')) == login_user['password'].encode('utf-8'):
-            session['username'] = request.form['username']
-            return redirect(url_for('index'))
-
-    return 'Invalid username/password combination'
-
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    if request.method == 'POST':
-        users = mongo.db.users
-        existing_user = users.find_one({'name' : request.form['username']})
-
-        if existing_user is None:
-            hashpass = bcrypt.hashpw(request.form['pass'].encode('utf-8'), bcrypt.gensalt())
-            users.insert({'name' : request.form['username'], 'password' : hashpass})
-            session['username'] = request.form['username']
-            return redirect(url_for('index'))
-        
-        return 'That username is already taken !'
-
-    return render_template('register.html')
-
-
 
 
 
@@ -65,9 +19,6 @@ def register():
 def get_recipes():
     return render_template("recipes.html", 
                            recipes=mongo.db.recipes.find())
-
-
-
 
 
 @app.route('/add_recipe')
@@ -99,11 +50,8 @@ def update_recipe(recipe_id):
         'recipe_name':request.form.get('recipe_name'),
         'category_name':request.form.get('category_name'),
         'recipe_description': request.form.get('recipe_description'),
-        'recipe_method': request.form.get('recipe_method'),
-        'recipe_ingredients':request.form.get('recipe_ingredients'),
-        'recipe_author':request.form.get('recipe_author'),
-        'recipe_origin':request.form.get('recipe_origin'),
-        
+        'due_date': request.form.get('due_date'),
+        'is_urgent':request.form.get('is_urgent')
     })
     return redirect(url_for('get_recipes'))
 
@@ -150,14 +98,7 @@ def insert_category():
 @app.route('/add_category')
 def add_category():
     return render_template('addcategory.html')
-    
 
-  
-#@app.route('/likes/<recipe_id', methods=['POST'])
-#def has_like(user, answer):
-  
-  
-    
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),

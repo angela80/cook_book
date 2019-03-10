@@ -1,0 +1,51 @@
+ {% extends 'base.html'%} 
+ 
+ {% block content %}
+ 
+ <P>Browse recipes here.Simple recipes to make it fun and easy.</P>
+<div class="row">
+    <h1>Recipes</h1>
+    <ul class="collapsible" data-collapsible="accordion">
+        {% for recipe in recipes %}
+        <li>
+            <div class="collapsible-header">
+                <div class="col s3">
+                    <i class="material-icons">expand_more</i>
+                    <form action="{{url_for('delete_recipe', recipe_id=recipe._id)}}" method="POST">
+                        <button type="submit" class="waves-effect waves-light btn btn_small grey">Done</button>
+                    </form>
+            
+                    <a href="{{url_for('edit_recipe', recipe_id=recipe._id)}}" class="waves-effect waves-light btn btn_small pink">Edit</a>
+                    
+                </div>
+                <div class=" task_header col s12">
+                    <strong>{{recipe.recipe_name}}-</strong><strong>{{recipe.recipe_description}}</strong>
+            
+                </div>
+            </div>
+            <div class="collapsible-body">
+                <span>
+            <p> {{recipe.recipe_method}}</p>
+              </span>
+           <div class="sub">
+                <span>
+            <p> {{recipe.recipe_ingredients}}</p>
+              </span>
+            </div>
+             <div class="sub">
+                <span>
+                {{recipe.recipe_author}}
+              </span>
+            </div>
+            <div class="sub">
+                <span>
+                {{recipe.recipe_origin}}
+              </span>
+            </diV>
+         </div>
+        </li>
+        {% endfor %}
+
+    </ul>
+</div>
+{% endblock %}
